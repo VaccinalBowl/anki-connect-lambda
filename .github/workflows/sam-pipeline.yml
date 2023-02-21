@@ -19,6 +19,6 @@ jobs:
           role-duration-seconds: 1200
           role-session-name: TestSession
       # sam build 
-      - run: sam build --use-container
+      - run: echo "Hello" #sam build --use-container
 # sam deploy
-      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-hello-world --s3-bucket anki-lambda-artefacts --capabilities CAPABILITY_IAM --region eu-central-1 
+      - run: echo "Goodbye" # sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-hello-world --s3-bucket anki-lambda-artefacts --capabilities CAPABILITY_IAM --region eu-central-1 
