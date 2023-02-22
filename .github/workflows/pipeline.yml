@@ -19,4 +19,5 @@ jobs:
           role-duration-seconds: 1200
           role-session-name: TestSession
       # sam build 
+      - run: sam build --use-container
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name anki-connect-lambda-stack --resolve-s3 --capabilities CAPABILITY_IAM --region eu-central-1
