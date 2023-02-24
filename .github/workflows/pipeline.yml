@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - master
+      - '**'
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
@@ -20,8 +20,4 @@ jobs:
           role-session-name: TestSession
       # sam build 
       - run: sam build --use-container
-
-# Run Unit tests- Specify unit tests here 
-
-# sam deploy
-      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-hello-world --s3-bucket anki-lambda-artefacts --capabilities CAPABILITY_IAM --region eu-central-1 
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name anki-connect-lambda-stack --resolve-s3 --capabilities CAPABILITY_IAM --region eu-central-1
