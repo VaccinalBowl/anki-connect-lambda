@@ -11,7 +11,21 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
  */
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    console.log(event);
     console.log("I am here guys");
+    
+    
+    fetch(`http://swapi.co/api/people/1/`)
+      .then(res => res.json())
+      .then((res: Object) => {
+          console.log(res);
+          // res is now an Actor
+      });
+    
+    
+    
+    
+    
     try {
         return {
             statusCode: 200,
