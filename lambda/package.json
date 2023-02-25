@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "esbuild": "^0.14.14",
-    "fetch-node": "^0.0.1"
+    "node-fetch": "^2.6.1"
   }
 }
