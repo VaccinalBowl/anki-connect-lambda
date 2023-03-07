@@ -19,16 +19,20 @@ Resources:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
   # This is a Lambda function config associated with the source code: hello-from-lambda.js
-  helloFromLambdaFunction:
+ ankiConnectLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/hello-from-lambda.helloFromLambdaHandler
+      Handler: src/handlers/anki-connect-lambda.ankiConnectLambda
       Runtime: nodejs18.x
       Architectures:
         - x86_64
       MemorySize: 3008
       Timeout: 100
-      Description: A Lambda function that returns a static string.
+      Description: Lambda that connects to anki connect running in EC2 instance and does some nice stuff.
       Policies:
         # Give Lambda basic execution Permission to the helloFromLambda
         - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+          ANKI_CONNECT_URL: 52.58.163.50
+          ANKI_CONNECT_PORT: 8765
