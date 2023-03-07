@@ -1,26 +1,8 @@
 
-import fetch from 'node-fetch';
-import { Headers } from 'node-fetch';
-//import {pinyinify} from 'hanzi-tools';
-var pinyinify = require("hanzi-tools").pinyinify;
 
+import {pinyinify} from 'hanzi-tools';
 
-type AnkiCardField = {
-    value: string
-}
-
-type AnkiCardFields = {
-    Front: AnkiCardField;
-    Back: AnkiCardField;
-    Pinyin: AnkiCardField;
-}
-
-type AnkiCard = {
-    cardId: number;
-    fields: AnkiCardFields;
-}
-
-function getListOfCards() {
+function checkForSingleCharactersWithoutACard() {
 
     console.log(process.env.ANKI_CONNECT_URL);
     console.log(process.env.ANKI_CONNECT_PORT);
@@ -89,9 +71,7 @@ function getListOfCards() {
 
 }
 
-
-export const lambdaHandler = (event: Object): String => {
-    getListOfCards();
+export const helloFromLambdaHandler = async () => {
+    console.info(pinyinify("你好！你今天吃饭了"));
     return "Done";
-
-};
+}
