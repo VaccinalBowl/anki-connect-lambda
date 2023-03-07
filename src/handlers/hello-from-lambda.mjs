@@ -1,7 +1,7 @@
 
 
 import {pinyinify} from 'hanzi-tools';
-
+/*
 function checkForSingleCharactersWithoutACard() {
 
     console.log(process.env.ANKI_CONNECT_URL);
@@ -69,7 +69,7 @@ function checkForSingleCharactersWithoutACard() {
 
 
 
-}
+}*/
 
 export const helloFromLambdaHandler = async () => {
     console.info(pinyinify("你好！你今天吃饭了"));
