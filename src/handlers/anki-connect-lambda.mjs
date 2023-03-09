@@ -1,7 +1,17 @@
 
 import {pinyinify} from 'hanzi-tools';
 
-
+function removeTags(str) {
+    if ((str===null) || (str===''))
+        return false;
+    else
+        str = str.toString();
+          
+    // Regular expression to identify HTML tags in
+    // the input string. Replacing the identified
+    // HTML tag with a null string.
+    return str.replace( /(<([^>]+)>)/ig, '');
+}
 
 async function checkForSingleCharactersWithoutACard() {
     
@@ -46,7 +56,8 @@ async function checkForSingleCharactersWithoutACard() {
         console.info(`There are a total of ${ankiCardArray.length} cards`);
 
         ankiCardArray.forEach((ankiCard) => {
-            let chinese = ankiCard.fields.Front.value;
+            let chinese = removeTags(ankiCard.fields.Front.value);
+                    
             if ((chinese.length == 1) && (chinese.match(/[\u3400-\u9FBF]/)))  {
                 singleCharacterMap.set(chinese, ankiCard);
                 singleCardCount++;
@@ -55,6 +66,7 @@ async function checkForSingleCharactersWithoutACard() {
                 doubleCardCount++;
             }
         });
+
         console.info(`There are a total of ${singleCardCount} single character cards`);
         console.info(`There are a total of ${doubleCardCount} double character cards`);
         
