@@ -1,22 +1,25 @@
-import fetch from 'node-fetch';
+
 import {pinyinify} from 'hanzi-tools';
 
-function checkForSingleCharactersWithoutACard() {
+
+
+async function checkForSingleCharactersWithoutACard() {
     
-    console.log(process.env.ANKI_CONNECT_URL);
-    console.log(process.env.ANKI_CONNECT_PORT);
+    console.info(process.env.ANKI_CONNECT_URL);
+    console.info(process.env.ANKI_CONNECT_PORT);
     let endpoint = 'http://' + process.env.ANKI_CONNECT_URL + ':' + process.env.ANKI_CONNECT_PORT;
 
     var requestHeaders = new Headers();
     requestHeaders.append("Content-Type", "application/json");
-    var requestBody = JSON.stringify({ "action": "findCards", "version": 6, "params": { "query": "deck:TestDeck" } });
+    var requestBody = JSON.stringify({ "action": "findCards", "version": 6, "params": { "query": "deck:ChinesePodDeck" }});
+    
     var requestOptions = {
         method: 'POST',
         headers: requestHeaders,
         body: requestBody
     };
     
-    fetch(endpoint, requestOptions)
+    let cardInfoResponseJson = await fetch(endpoint, requestOptions)
         .then(response => {
             return response.json()
         })
@@ -31,48 +34,70 @@ function checkForSingleCharactersWithoutACard() {
             return fetch(endpoint, cardInfoRequestOptions);
         })
         .then(cardInfoResponse => cardInfoResponse.json())
-        .then(cardInfoResponseJson => {
-            var ankiCardArray = cardInfoResponseJson.result;
-            let singleCharacterMap = new Map();
-            let multipleChararacterCards = [];
-            let singleCardCount = 0;
-            let doubleCardCount = 0;
-            console.log(`There are a total of ${ankiCardArray.length} cards`);
+       
 
-            ankiCardArray.forEach((ankiCard) => {
-                let chinese = ankiCard.fields.Front.value;
-                if (chinese.length == 1) {
-                    singleCharacterMap.set(chinese, ankiCard);
-                    singleCardCount++;
-                } else {
-                    multipleChararacterCards.push(ankiCard);
-                    doubleCardCount++;
+        .catch(error => console.info('error', error));
+
+        var ankiCardArray = cardInfoResponseJson.result;
+        let singleCharacterMap = new Map();
+        let multipleChararacterCards = [];
+        let singleCardCount = 0;
+        let doubleCardCount = 0;
+        console.info(`There are a total of ${ankiCardArray.length} cards`);
+
+        ankiCardArray.forEach((ankiCard) => {
+            let chinese = ankiCard.fields.Front.value;
+            if ((chinese.length == 1) && (chinese.match(/[\u3400-\u9FBF]/)))  {
+                singleCharacterMap.set(chinese, ankiCard);
+                singleCardCount++;
+            } else {
+                multipleChararacterCards.push(ankiCard);
+                doubleCardCount++;
+            }
+        });
+        console.info(`There are a total of ${singleCardCount} single character cards`);
+        console.info(`There are a total of ${doubleCardCount} double character cards`);
+        
+        var newNotes = [];
+        multipleChararacterCards.forEach((multiCharacterCard) => {
+            let chinese = multiCharacterCard.fields.Front.value;
+            chinese.split('').forEach(chineseCharacter => {
+                if ((!singleCharacterMap.has(chineseCharacter) && chineseCharacter.match(/[\u3400-\u9FBF]/))) {
+                    var pinyin = pinyinify(chineseCharacter);
+                    console.info(`${chineseCharacter},,${pinyin}`)
+                    var note = {
+                        "deckName":"ChinesePodDeck",
+                        "modelName":"Basic",
+                        "fields": {
+                            "Front": chineseCharacter,
+                            "Back": "",
+                            "Pinyin": pinyin
+                        }
+                    }
+                    newNotes.push(note);
+                    singleCharacterMap.set(chineseCharacter,null);
                 }
             });
-            console.log(`There are a total of ${singleCardCount} single character cards`);
-            console.log(`There are a total of ${doubleCardCount} double character cards`);
-
-
-            multipleChararacterCards.forEach((multiCharacterCard) => {
-                let chinese = multiCharacterCard.fields.Front.value;
-                chinese.split('').forEach(chineseCharacter => {
-                    if (!singleCharacterMap.has(chineseCharacter)) {
-                        var pinyin = pinyinify(chineseCharacter);
-                        console.log(`${chineseCharacter},,${pinyin}`)
-                    }
-                });
-
-            });
-        }
-
-        )
-        .catch(error => console.log('error', error));
+        });
+        console.info(`${newNotes.length} will be added`);
+        requestHeaders = new Headers();
+        requestHeaders.append("Content-Type", "application/json");
+        requestBody = JSON.stringify({ "action": "addNotes", "version": 6, "params": { "notes": newNotes }});
+        requestOptions = {
+            method: 'POST',
+            headers: requestHeaders,
+            body: requestBody
+        };
         
+        let addNoteResponseJson = await fetch(endpoint, requestOptions)
+            .then(addNoteResponse => addNoteResponse.json());
 
-
+        addNoteResponseJson.result.forEach(noteId => {console.info(noteId)});
+        return "Done";
 }
 
-export const ankiConnectLambda = () => {
-    checkForSingleCharactersWithoutACard();
-    return "Done";
+export const ankiConnectLambda = async (event,context) => {
+    let res = await checkForSingleCharactersWithoutACard();
+    return res;
+
 }

@@ -22,7 +22,7 @@
         ]
     },
     "dependencies": {
-        "hanzi-tools": "^1.2.26",
-        "left-pad": "^1.3.0"
+        "aws-sdk": "^2.1330.0",
+        "hanzi-tools": "^1.2.26"
     }
 }
